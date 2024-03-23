@@ -194,7 +194,7 @@ const PersonalSignupForm = () => {
             </Grid>
             <Grid item xs={12} md={4}>
               <TextField
-                label="Phone Number"
+                label="Phone number"
                 variant="standard"
                 type="number"
                 fullWidth
@@ -221,46 +221,12 @@ const PersonalSignupForm = () => {
         <Button
           variant="outlined"
           onClick={() => setShowForm(true)}
-          color="secondary"
           size="medium"
         >
           Add Family Member
         </Button>
       </Grid>
       <>
-        {familyMembers.length > 0 && (
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight={'bold'}>
-                    Name
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight={'bold'}>
-                    National ID
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight={'bold'}>
-                    Date of Birth
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {familyMembers.map((member, index) => (
-                <TableRow key={index}>
-                  <TableCell>{member.fullName}</TableCell>
-                  <TableCell>{member.nationalId}</TableCell>
-                  <TableCell>{`${member.dateOfBirth.month}/${member.dateOfBirth.day}/${member.dateOfBirth.year}`}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-
         {showForm && (
           <form onSubmit={familyFormik.handleSubmit}>
             <Grid container xs={12} spacing={5} alignItems={'center'}>
@@ -326,6 +292,38 @@ const PersonalSignupForm = () => {
               </Grid>
             </Grid>
           </form>
+        )}
+        {familyMembers.length > 0 && (
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <Typography variant="subtitle1" fontWeight={'bold'}>
+                    Name
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle1" fontWeight={'bold'}>
+                    National ID
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle1" fontWeight={'bold'}>
+                    Date of Birth
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {familyMembers.map((member, index) => (
+                <TableRow key={index}>
+                  <TableCell>{member.fullName}</TableCell>
+                  <TableCell>{member.nationalId}</TableCell>
+                  <TableCell>{`${member.dateOfBirth.month}/${member.dateOfBirth.day}/${member.dateOfBirth.year}`}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
       </>
       <form onSubmit={formik.handleSubmit}>
