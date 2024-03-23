@@ -4,7 +4,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Stack,
+  Stack
 } from '@mui/material'
 import { AccountTypes, accountTypes } from '../constants/common'
 import React from 'react'
@@ -15,11 +15,11 @@ import OrganizationSignupForm from '../components/SignupForms/OrganizationSignup
 const Signup = () => {
   const formik = useFormik({
     initialValues: {
-      accountType: '',
+      accountType: ''
     },
-    onSubmit: (values) => {
+    onSubmit: values => {
       console.log(values)
-    },
+    }
   })
 
   const renderSelectedForm = () => {
@@ -38,16 +38,17 @@ const Signup = () => {
         <Grid container xs={12}>
           <Grid item xs={12} md={6}>
             <FormControl fullWidth>
-              <InputLabel id='demo-simple-select-label'>
+              <InputLabel id="demo-simple-select-label">
                 Account type
               </InputLabel>
               <Select
                 value={formik.values.accountType}
-                label='Account type'
-                name='accountType'
+                label="Account type"
+                name="accountType"
                 onChange={formik.handleChange}
-                fullWidth>
-                {accountTypes.map((at) => {
+                fullWidth
+              >
+                {accountTypes.map(at => {
                   return <MenuItem value={at.value}>{at.name}</MenuItem>
                 })}
               </Select>

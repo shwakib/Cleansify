@@ -10,7 +10,7 @@ const StyledContainer = styled(Container)(() => ({
   display: 'flex',
   justifyContent: 'center',
   height: '100vh',
-  alignItems: 'center',
+  alignItems: 'center'
 }))
 
 const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
@@ -18,7 +18,7 @@ const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
 
   return (
     <div style={{ background: theme.palette.background.default }}>
-      <StyledContainer maxWidth='md'>{children}</StyledContainer>
+      <StyledContainer maxWidth="md">{children}</StyledContainer>
     </div>
   )
 }
