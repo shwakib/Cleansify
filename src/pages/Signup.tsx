@@ -1,16 +1,10 @@
-import {
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack
-} from '@mui/material'
+import { Grid, Stack } from '@mui/material'
 import { AccountTypes, accountTypes } from '../constants/common'
 import React from 'react'
 import { useFormik } from 'formik'
 import PersonalSignupForm from '../components/SignupForms/PersonalSignupForm'
 import OrganizationSignupForm from '../components/SignupForms/OrganizationSignupForm'
+import Dropdown from '../components/Dropdown'
 
 const Signup = () => {
   const formik = useFormik({
@@ -37,22 +31,14 @@ const Signup = () => {
       <form onSubmit={formik.handleSubmit}>
         <Grid container xs={12}>
           <Grid item xs={12} md={6}>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">
-                Account type
-              </InputLabel>
-              <Select
-                value={formik.values.accountType}
-                label="Account type"
-                name="accountType"
-                onChange={formik.handleChange}
-                fullWidth
-              >
-                {accountTypes.map(at => {
-                  return <MenuItem value={at.value}>{at.name}</MenuItem>
-                })}
-              </Select>
-            </FormControl>
+            <Dropdown
+              value={formik.values.accountType}
+              label="Account type"
+              name="accountType"
+              onChange={formik.handleChange}
+              fullWidth
+              options={accountTypes}
+            />
           </Grid>
         </Grid>
       </form>
