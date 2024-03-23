@@ -18,6 +18,7 @@
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "jsxFactory": "React.createElement",
+    "jsxFragmentFactory": "React.Fragment",
     "baseUrl": "./",
     "paths": {
       "*": ["src/*"]
