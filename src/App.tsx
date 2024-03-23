@@ -1,11 +1,15 @@
-import React from "react";
+import AuthPage from './pages/AuthPage'
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 function App() {
   return (
-    <div>
-   
-    </div>
-  );
+    <Router>
+      <Routes>
+        <Route path="/" element={<AuthPage />} />
+      </Routes>
+    </Router>
+  )
 }
 
-export default App;
+export default App
