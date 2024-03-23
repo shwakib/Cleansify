@@ -32,7 +32,15 @@ const AuthPage = () => {
           </Button>
         </Grid>
         <Grid item xs={12}>
-          <Button variant="outlined" color="primary" size="large" fullWidth>
+          <Button
+            variant="outlined"
+            color="primary"
+            size="large"
+            fullWidth
+            onClick={() => {
+              navigate('/login')
+            }}
+          >
             Login
           </Button>
         </Grid>
