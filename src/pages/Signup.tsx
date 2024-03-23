@@ -33,7 +33,7 @@ const Signup = () => {
   }
 
   return (
-    <Stack width={'100%'}>
+    <Stack width={'100%'} gap={5}>
       <form onSubmit={formik.handleSubmit}>
         <Grid container xs={12}>
           <Grid item xs={12} md={6}>

@@ -1,7 +1,256 @@
-import React from 'react'
+import {
+  Button,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography
+} from '@mui/material'
+import Dropdown from '../../components/Dropdown'
+import React, { Fragment, useState } from 'react'
+import {
+  generateDaysInMonth,
+  generateMonthsArray,
+  generateYearsArray
+} from '../../utils/helper'
+import { useFormik } from 'formik'
+import { StateNames } from '../../constants/common'
 
 const PersonalSignupForm = () => {
-  return <div>PersonalSignupForm</div>
+  const [familyMembers, setFamilyMembers] = useState<
+    Array<{ name: string; nationalId: string; dob: string }>
+  >([])
+
+  const [showForm, setShowForm] = useState(false)
+  const [newMember, setNewMember] = useState({
+    name: '',
+    nationalId: '',
+    dob: ''
+  })
+
+  const handleAddMemberClick = () => {
+    setShowForm(true)
+  }
+
+  const handleAddFamilyMember = () => {
+    setFamilyMembers([...familyMembers, newMember])
+    setNewMember({ name: '', nationalId: '', dob: '' })
+    setShowForm(false)
+  }
+
+  const handleChange = event => {
+    const { name, value } = event.target
+    setNewMember({ ...newMember, [name]: value })
+  }
+
+  const formik = useFormik({
+    initialValues: {
+      fullName: '',
+      dateOfBirth: {
+        day: '',
+        month: '',
+        year: ''
+      },
+      nationalId: '',
+      address: {
+        fullAdress: '',
+        state: ''
+      },
+      email: '',
+      phoneNumber: '',
+      password: ''
+    },
+    onSubmit: values => {
+      console.log(values)
+    }
+  })
+
+  return (
+    <Fragment>
+      <form>
+        <Grid container xs={12} spacing={5}>
+          {/* 1st row start */}
+          <Grid item xs={12}>
+            <TextField
+              label="Full name"
+              variant="standard"
+              fullWidth
+              value={formik.values.fullName}
+              onChange={formik.handleChange}
+              name="fullName"
+            />
+          </Grid>
+
+          {/* 2nd row start */}
+          <Grid item container alignItems={'center'} xs={12} columnSpacing={5}>
+            <Grid item xs={12}>
+              <Typography variant="body1" fontWeight={'bold'}>
+                Date of birth
+              </Typography>
+            </Grid>
+            <Grid container item md={6} xs={12} spacing={3}>
+              <Grid item md={3} xs={12}>
+                <Dropdown
+                  fullWidth
+                  label="Day"
+                  name="dateOfBirth.day"
+                  options={generateDaysInMonth(
+                    Number(formik.values.dateOfBirth.month),
+                    Number(formik.values.dateOfBirth.year)
+                  )}
+                  value={formik.values.dateOfBirth.day}
+                  onChange={formik.handleChange}
+                />
+              </Grid>
+              <Grid item md={4} xs={12}>
+                <Dropdown
+                  fullWidth
+                  label="Month"
+                  options={generateMonthsArray()}
+                  value={formik.values.dateOfBirth.month}
+                  onChange={formik.handleChange}
+                  name="dateOfBirth.month"
+                />
+              </Grid>
+              <Grid item md={5} xs={12}>
+                <Dropdown
+                  fullWidth
+                  label="Year"
+                  options={generateYearsArray()}
+                  value={formik.values.dateOfBirth.year}
+                  onChange={formik.handleChange}
+                  name="dateOfBirth.year"
+                />
+              </Grid>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                label="National Id"
+                variant="standard"
+                fullWidth
+                value={formik.values.nationalId}
+                onChange={formik.handleChange}
+                name="nationalId"
+              />
+            </Grid>
+          </Grid>
+          {/* 3rd row start */}
+          <Grid container item xs={12} spacing={5}>
+            <Grid item xs={12} md={8}>
+              <TextField
+                label="Full address"
+                variant="standard"
+                fullWidth
+                value={formik.values.address.fullAdress}
+                onChange={formik.handleChange}
+                name="address.fullAdress"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Dropdown
+                fullWidth
+                label="State"
+                value={formik.values.address.state}
+                name="address.state"
+                onChange={formik.handleChange}
+                options={StateNames}
+              />
+            </Grid>
+          </Grid>
+          {/* 4th row start */}
+          <Grid container item xs={12} spacing={5}>
+            <Grid item xs={12} md={4}>
+              <TextField
+                label="Email"
+                variant="standard"
+                type="email"
+                fullWidth
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                name="email"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                label="Phone Number"
+                variant="standard"
+                type="number"
+                fullWidth
+                value={formik.values.phoneNumber}
+                onChange={formik.handleChange}
+                name="phoneNumber"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                label="Password"
+                variant="standard"
+                type="password"
+                fullWidth
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                name="password"
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <>
+          {familyMembers.length > 0 && ( // Conditionally render the table only if there are family members
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>National ID</TableCell>
+                  <TableCell>Date of Birth</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {familyMembers.map((member, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{member.name}</TableCell>
+                    <TableCell>{member.nationalId}</TableCell>
+                    <TableCell>{member.dob}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+          <Button variant="contained" onClick={handleAddMemberClick}>
+            Add Family Member
+          </Button>
+          {showForm && (
+            <div>
+              <TextField
+                label="Name"
+                value={newMember.name}
+                onChange={handleChange}
+                name="name"
+              />
+              <TextField
+                label="National ID"
+                value={newMember.nationalId}
+                onChange={handleChange}
+                name="nationalId"
+              />
+              <TextField
+                label="Date of Birth"
+                value={newMember.dob}
+                onChange={handleChange}
+                name="dob"
+              />
+              <Button variant="contained" onClick={handleAddFamilyMember}>
+                Add
+              </Button>
+            </div>
+          )}
+        </>
+      </form>
+    </Fragment>
+  )
 }
 
 export default PersonalSignupForm
