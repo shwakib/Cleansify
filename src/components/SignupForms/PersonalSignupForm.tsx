@@ -19,32 +19,20 @@ import {
 import { useFormik } from 'formik'
 import { StateNames } from '../../constants/common'
 
+interface FamilyMembers {
+  fullName: string
+  nationalId: string
+  dateOfBirth: {
+    day: string
+    month: string
+    year: string
+  }
+}
+
 const PersonalSignupForm = () => {
-  const [familyMembers, setFamilyMembers] = useState<
-    Array<{ name: string; nationalId: string; dob: string }>
-  >([])
+  const [familyMembers, setFamilyMembers] = useState<Array<FamilyMembers>>([])
 
   const [showForm, setShowForm] = useState(false)
-  const [newMember, setNewMember] = useState({
-    name: '',
-    nationalId: '',
-    dob: ''
-  })
-
-  const handleAddMemberClick = () => {
-    setShowForm(true)
-  }
-
-  const handleAddFamilyMember = () => {
-    setFamilyMembers([...familyMembers, newMember])
-    setNewMember({ name: '', nationalId: '', dob: '' })
-    setShowForm(false)
-  }
-
-  const handleChange = event => {
-    const { name, value } = event.target
-    setNewMember({ ...newMember, [name]: value })
-  }
 
   const formik = useFormik({
     initialValues: {
@@ -65,6 +53,37 @@ const PersonalSignupForm = () => {
     },
     onSubmit: values => {
       console.log(values)
+    }
+  })
+
+  const familyFormik = useFormik({
+    initialValues: {
+      fullName: '',
+      dateOfBirth: {
+        day: '',
+        month: '',
+        year: ''
+      },
+      nationalId: ''
+    },
+    onSubmit: values => {
+      console.log(values)
+
+      const newMember: FamilyMembers = {
+        fullName: values.fullName,
+        nationalId: values.nationalId,
+        dateOfBirth: {
+          day: values.dateOfBirth.day,
+          month: values.dateOfBirth.month,
+          year: values.dateOfBirth.year
+        }
+      }
+
+      setFamilyMembers(prevState => [...prevState, newMember])
+
+      setShowForm(false)
+
+      familyFormik.resetForm()
     }
   })
 
@@ -197,57 +216,126 @@ const PersonalSignupForm = () => {
             </Grid>
           </Grid>
         </Grid>
-
-        <>
-          {familyMembers.length > 0 && ( // Conditionally render the table only if there are family members
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>National ID</TableCell>
-                  <TableCell>Date of Birth</TableCell>
+      </form>
+      <Grid container item xs={12}>
+        <Button
+          variant="outlined"
+          onClick={() => setShowForm(true)}
+          color="secondary"
+          size="medium"
+        >
+          Add Family Member
+        </Button>
+      </Grid>
+      <>
+        {familyMembers.length > 0 && (
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <Typography variant="subtitle1" fontWeight={'bold'}>
+                    Name
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle1" fontWeight={'bold'}>
+                    National ID
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle1" fontWeight={'bold'}>
+                    Date of Birth
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {familyMembers.map((member, index) => (
+                <TableRow key={index}>
+                  <TableCell>{member.fullName}</TableCell>
+                  <TableCell>{member.nationalId}</TableCell>
+                  <TableCell>{`${member.dateOfBirth.month}/${member.dateOfBirth.day}/${member.dateOfBirth.year}`}</TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {familyMembers.map((member, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{member.name}</TableCell>
-                    <TableCell>{member.nationalId}</TableCell>
-                    <TableCell>{member.dob}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-          <Button variant="contained" onClick={handleAddMemberClick}>
-            Add Family Member
-          </Button>
-          {showForm && (
-            <div>
-              <TextField
-                label="Name"
-                value={newMember.name}
-                onChange={handleChange}
-                name="name"
-              />
-              <TextField
-                label="National ID"
-                value={newMember.nationalId}
-                onChange={handleChange}
-                name="nationalId"
-              />
-              <TextField
-                label="Date of Birth"
-                value={newMember.dob}
-                onChange={handleChange}
-                name="dob"
-              />
-              <Button variant="contained" onClick={handleAddFamilyMember}>
-                Add
-              </Button>
-            </div>
-          )}
-        </>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+
+        {showForm && (
+          <form onSubmit={familyFormik.handleSubmit}>
+            <Grid container xs={12} spacing={5} alignItems={'center'}>
+              <Grid item xs={12} md={3}>
+                <TextField
+                  label="Name"
+                  variant="standard"
+                  value={familyFormik.values.fullName}
+                  onChange={familyFormik.handleChange}
+                  name="fullName"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <TextField
+                  label="National ID"
+                  variant="standard"
+                  value={familyFormik.values.nationalId}
+                  onChange={familyFormik.handleChange}
+                  name="nationalId"
+                  fullWidth
+                />
+              </Grid>
+              <Grid container item xs={12} md={3} spacing={3}>
+                <Grid item md={3} xs={12}>
+                  <Dropdown
+                    fullWidth
+                    label="Day"
+                    name="dateOfBirth.day"
+                    options={generateDaysInMonth(
+                      Number(familyFormik.values.dateOfBirth.month),
+                      Number(familyFormik.values.dateOfBirth.year)
+                    )}
+                    value={familyFormik.values.dateOfBirth.day}
+                    onChange={familyFormik.handleChange}
+                  />
+                </Grid>
+                <Grid item md={4} xs={12}>
+                  <Dropdown
+                    fullWidth
+                    label="Month"
+                    options={generateMonthsArray()}
+                    value={familyFormik.values.dateOfBirth.month}
+                    onChange={familyFormik.handleChange}
+                    name="dateOfBirth.month"
+                  />
+                </Grid>
+                <Grid item md={5} xs={12}>
+                  <Dropdown
+                    fullWidth
+                    label="Year"
+                    options={generateYearsArray()}
+                    value={familyFormik.values.dateOfBirth.year}
+                    onChange={familyFormik.handleChange}
+                    name="dateOfBirth.year"
+                  />
+                </Grid>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Button variant="contained" type="submit" fullWidth>
+                  Add
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        )}
+      </>
+      <form onSubmit={formik.handleSubmit}>
+        <Grid container justifyContent={'end'}>
+          <Grid item md={4} xs={12}>
+            <Button variant="contained" color="success" fullWidth size="large">
+              Submit
+            </Button>
+          </Grid>
+        </Grid>
       </form>
     </Fragment>
   )
