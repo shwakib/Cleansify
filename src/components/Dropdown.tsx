@@ -21,12 +21,19 @@ const Dropdown: React.FC<DropdownProps> = ({
   options,
   value,
   name,
-  fullWidth
+  fullWidth,
+  ...props
 }) => {
   return (
     <FormControl variant="standard" fullWidth={fullWidth}>
       <InputLabel id="demo-simple-select-standard-label">{label}</InputLabel>
-      <Select value={value} onChange={onChange} label={label} name={name}>
+      <Select
+        value={value}
+        onChange={onChange}
+        label={label}
+        name={name}
+        {...props}
+      >
         {options.map(option => {
           return <MenuItem value={option.value}>{option.name}</MenuItem>
         })}
