@@ -92,6 +92,9 @@ const OrganizationSignupForm = () => {
                 variant="standard"
                 label="Organization name"
                 fullWidth
+                value={formik.values.orgName}
+                name="orgName"
+                onChange={formik.handleChange}
               />
             </Grid>
             <Grid item xs={12} md={5}>
@@ -99,12 +102,22 @@ const OrganizationSignupForm = () => {
                 variant="standard"
                 label="Product / Service type"
                 fullWidth
+                value={formik.values.productType}
+                name="productType"
+                onChange={formik.handleChange}
               />
             </Grid>
           </Grid>
           <Grid container item xs={12} spacing={5}>
             <Grid item xs={12} md={7}>
-              <TextField variant="standard" label="Address" fullWidth />
+              <TextField
+                variant="standard"
+                label="Address"
+                fullWidth
+                value={formik.values.address.fullAddress}
+                name="address.fullAddress"
+                onChange={formik.handleChange}
+              />
             </Grid>
             <Grid item xs={12} md={5}>
               <Dropdown
@@ -124,6 +137,9 @@ const OrganizationSignupForm = () => {
                 label="Phone number"
                 fullWidth
                 type="number"
+                value={formik.values.phoneNumber}
+                name="phoneNumber"
+                onChange={formik.handleChange}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -132,6 +148,9 @@ const OrganizationSignupForm = () => {
                 variant="standard"
                 label="Email"
                 fullWidth
+                value={formik.values.email}
+                name="email"
+                onChange={formik.handleChange}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -140,6 +159,9 @@ const OrganizationSignupForm = () => {
                 variant="standard"
                 label="Password"
                 fullWidth
+                value={formik.values.password}
+                name="password"
+                onChange={formik.handleChange}
               />
             </Grid>
           </Grid>
@@ -245,6 +267,21 @@ const OrganizationSignupForm = () => {
           </TableBody>
         </Table>
       )}
+      <form onSubmit={formik.handleSubmit}>
+        <Grid container justifyContent={'end'}>
+          <Grid item md={4} xs={12}>
+            <Button
+              variant="contained"
+              color="success"
+              fullWidth
+              size="large"
+              type="submit"
+            >
+              Submit
+            </Button>
+          </Grid>
+        </Grid>
+      </form>
     </>
   )
 }
