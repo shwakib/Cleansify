@@ -89,7 +89,7 @@ const PersonalSignupForm = () => {
 
   return (
     <Fragment>
-      <form>
+      <form onSubmit={formik.handleSubmit}>
         <Grid container xs={12} spacing={5}>
           {/* 1st row start */}
           <Grid item xs={12}>
@@ -331,7 +331,13 @@ const PersonalSignupForm = () => {
       <form onSubmit={formik.handleSubmit}>
         <Grid container justifyContent={'end'}>
           <Grid item md={4} xs={12}>
-            <Button variant="contained" color="success" fullWidth size="large">
+            <Button
+              variant="contained"
+              color="success"
+              fullWidth
+              size="large"
+              type="submit"
+            >
               Submit
             </Button>
           </Grid>
