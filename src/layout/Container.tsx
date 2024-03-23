@@ -9,8 +9,11 @@ interface AppContainerProps {
 const StyledContainer = styled(Container)(() => ({
   display: 'flex',
   justifyContent: 'center',
-  height: '100vh',
-  alignItems: 'center'
+  height: 'max-content',
+  alignItems: 'center',
+  paddingTop: '120px',
+  minHeight: '100vh',
+  paddingBottom: '120px'
 }))
 
 const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
