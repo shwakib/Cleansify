@@ -11,7 +11,7 @@ export interface FamilyMembers {
 }
 
 export interface PersonalUser {
-  accountType: AccountTypes.PERSONAL | AccountTypes.ORGANIZATION
+  accountType: AccountTypes.PERSONAL
   userId: string
   fullName: string
   dateOfBirth: {
@@ -27,4 +27,19 @@ export interface PersonalUser {
   email: string
   phoneNumber: string
   familyMembers?: FamilyMembers[]
+}
+
+export interface OrgUser {
+  accountType: AccountTypes.ORGANIZATION
+  userId: string
+  orgName: string
+  productType: string
+  address: {
+    fullAddress: string
+    state: string
+  }
+  email: string
+  phoneNumber: string
+  file: File
+  filePath?: string
 }
