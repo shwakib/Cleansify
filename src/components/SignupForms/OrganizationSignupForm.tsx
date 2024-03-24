@@ -10,9 +10,15 @@ import {
   Typography
 } from '@mui/material'
 import Dropdown from '../../components/Dropdown'
-import { StateNames } from '../../constants/common'
+import { AccountTypes, StateNames } from '../../constants/common'
 import { useFormik } from 'formik'
 import React, { useState } from 'react'
+import { addDoc, collection, getFirestore } from 'firebase/firestore'
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
+import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage'
+import app from '../../config/firebase.config'
+import { OrgUser } from '../../models/user.model'
+import Backdrop from '../../components/Backdrop'
 
 interface Factory {
   address: {
@@ -21,25 +27,95 @@ interface Factory {
   }
 }
 
+interface FormValues extends Omit<OrgUser, 'userId'> {
+  password: string
+}
+
+type OrgUserDoc = Omit<OrgUser, 'file'>
+
 const OrganizationSignupForm = () => {
   const [showForm, setShowForm] = useState(false)
   const [factories, setFactories] = useState<Factory[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
+
+  const auth = getAuth(app)
+  const db = getFirestore(app)
+
+  const initialValues: FormValues = {
+    accountType: AccountTypes.ORGANIZATION,
+    orgName: '',
+    productType: '',
+    address: {
+      fullAddress: '',
+      state: ''
+    },
+    email: '',
+    phoneNumber: '',
+    password: '',
+    file: null as unknown as File
+  }
 
   const formik = useFormik({
-    initialValues: {
-      orgName: '',
-      productType: '',
-      address: {
-        fullAddress: '',
-        state: ''
-      },
-      email: '',
-      phoneNumber: '',
-      password: '',
-      file: null as File | null
-    },
-    onSubmit: values => {
-      console.log(values)
+    initialValues,
+    onSubmit: async values => {
+      let fileRef
+      setLoading(true)
+      try {
+        const userCredentials = await createUserWithEmailAndPassword(
+          auth,
+          values.email,
+          values.password
+        )
+
+        const user = userCredentials.user
+
+        try {
+          const userDoc: OrgUserDoc = {
+            accountType: AccountTypes.ORGANIZATION,
+            userId: user.uid,
+            orgName: values.orgName,
+            productType: values.productType,
+            address: {
+              fullAddress: values.address.fullAddress,
+              state: values.address.state
+            },
+            email: values.email,
+            phoneNumber: values.phoneNumber,
+            filePath: `files/${user.uid}/${values.file?.name}`
+          }
+
+          await addDoc(collection(db, 'orgUsers'), userDoc)
+
+          // Create a reference to Firebase Storage
+          const storage = getStorage()
+          const storageRef = ref(storage)
+
+          // Upload the file to Firebase Storage
+          fileRef = ref(storageRef, `files/${user.uid}/${values.file?.name}`)
+          await uploadBytes(fileRef, values.file)
+          formik.resetForm()
+        } catch (error) {
+          await user.delete()
+          if (fileRef) {
+            try {
+              await deleteObject(fileRef)
+            } catch (deleteError) {
+              console.error('Error deleting file:', deleteError)
+            }
+          }
+          console.log(error)
+        }
+      } catch (err) {
+        if (fileRef) {
+          try {
+            await deleteObject(fileRef)
+          } catch (deleteError) {
+            console.error('Error deleting file:', deleteError)
+          }
+        }
+        console.log(err)
+      }
+      setLoading(false)
     }
   })
 
@@ -84,6 +160,7 @@ const OrganizationSignupForm = () => {
 
   return (
     <>
+      {loading ? <Backdrop open={loading} /> : null}
       <form>
         <Grid container xs={12} rowSpacing={3}>
           <Grid container item xs={12} spacing={5}>
@@ -196,7 +273,6 @@ const OrganizationSignupForm = () => {
               }}
               value={formik.values.file ? formik.values.file.name : ''}
               error={formik.touched.file && Boolean(formik.errors.file)}
-              helperText={formik.touched.file && formik.errors.file}
             />
           </Grid>
         </Grid>
