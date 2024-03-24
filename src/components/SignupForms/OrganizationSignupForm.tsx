@@ -83,8 +83,9 @@ const OrganizationSignupForm = () => {
             phoneNumber: values.phoneNumber,
             filePath: `files/${user.uid}/${values.file?.name}`
           }
-
-          await addDoc(collection(db, 'orgUsers'), userDoc)
+          if (user) {
+            await addDoc(collection(db, 'orgUsers'), userDoc)
+          }
 
           // Create a reference to Firebase Storage
           const storage = getStorage()

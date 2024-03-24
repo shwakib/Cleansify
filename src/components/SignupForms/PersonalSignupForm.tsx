@@ -86,7 +86,9 @@ const PersonalSignupForm = () => {
             nationalId: values.nationalId,
             familyMembers
           }
-          await addDoc(collection(db, 'users'), userDoc)
+          if (user) {
+            await addDoc(collection(db, 'users'), userDoc)
+          }
           formik.resetForm()
           setFamilyMembers([])
         } catch (error) {
