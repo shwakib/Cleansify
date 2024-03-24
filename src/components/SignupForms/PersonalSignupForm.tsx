@@ -22,6 +22,7 @@ import { addDoc, collection, getFirestore } from 'firebase/firestore'
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
 import app from '../../config/firebase.config'
 import { FamilyMembers, PersonalUser } from '../../models/user.model'
+import Backdrop from '../../components/Backdrop'
 
 interface FormValues extends Omit<PersonalUser, 'userId'> {
   password: string
@@ -29,7 +30,8 @@ interface FormValues extends Omit<PersonalUser, 'userId'> {
 
 const PersonalSignupForm = () => {
   const [familyMembers, setFamilyMembers] = useState<Array<FamilyMembers>>([])
-  const [showForm, setShowForm] = useState(false)
+  const [showForm, setShowForm] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
 
   const auth = getAuth(app)
   const db = getFirestore(app)
@@ -55,6 +57,7 @@ const PersonalSignupForm = () => {
   const formik = useFormik({
     initialValues,
     onSubmit: async values => {
+      setLoading(true)
       try {
         const userCredentials = await createUserWithEmailAndPassword(
           auth,
@@ -90,6 +93,7 @@ const PersonalSignupForm = () => {
           await user.delete()
         }
       } catch (error) {}
+      setLoading(false)
     }
   })
 
@@ -124,6 +128,7 @@ const PersonalSignupForm = () => {
 
   return (
     <Fragment>
+      {loading ? <Backdrop open={loading} /> : null}
       <form onSubmit={formik.handleSubmit}>
         <Grid container xs={12} spacing={5}>
           {/* 1st row start */}
