@@ -7,6 +7,7 @@ import AppContainer from './layout/Container'
 import Signup from './pages/Signup'
 import Login from './pages/Login'
 import UserProvider from './state/user/user.provider'
+import Dashboard from './pages/Dashboard'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
               <Route path="/" element={<AuthPage />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/Dashboard/:userId" element={<Dashboard />} />
             </Routes>
           </Router>
         </AppContainer>
