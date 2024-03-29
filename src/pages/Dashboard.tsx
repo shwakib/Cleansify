@@ -14,6 +14,7 @@ import app from '../config/firebase.config'
 import PersonalInfo from '../components/PersonalInfo'
 import Backdrop from '../components/Backdrop'
 import { AccountTypes } from '../constants/common'
+import DataForm from '../components/DataForm'
 
 const Dashboard = () => {
   const { userId } = useParams()
@@ -42,7 +43,6 @@ const Dashboard = () => {
         where('userId', '==', uid)
       )
       const orgUserSnapshot = await getDocs(orgUserQuery)
-      console.log(orgUserSnapshot.docs[0])
 
       if (!orgUserSnapshot.empty) {
         setUser(orgUserSnapshot.docs[0].data() as OrgUser)
@@ -63,7 +63,7 @@ const Dashboard = () => {
       {loading ? (
         <Backdrop open={loading} />
       ) : (
-        <Grid container rowSpacing={3}>
+        <Grid container spacing={3}>
           <Grid item xs={12}>
             {user?.accountType === AccountTypes.ORGANIZATION ? (
               <Typography variant="h4">Your Organization Account</Typography>
@@ -81,6 +81,7 @@ const Dashboard = () => {
             dateOfBirth={(user as PersonalUser)?.dateOfBirth}
             nationalId={(user as PersonalUser)?.nationalId}
           />
+          <DataForm />
         </Grid>
       )}
     </>
