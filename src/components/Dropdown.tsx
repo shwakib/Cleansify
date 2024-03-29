@@ -35,7 +35,11 @@ const Dropdown: React.FC<DropdownProps> = ({
         {...props}
       >
         {options.map(option => {
-          return <MenuItem value={option.value}>{option.name}</MenuItem>
+          return (
+            <MenuItem key={option.value} value={option.value}>
+              {option.name}
+            </MenuItem>
+          )
         })}
       </Select>
     </FormControl>

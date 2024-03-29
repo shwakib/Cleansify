@@ -117,6 +117,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ accountType }) => {
               fullWidth
               type="submit"
             >
+            <Button
+              variant="contained"
+              color="success"
+              size="large"
+              fullWidth
+              type="submit"
+            >
               Login
             </Button>
           </Grid>
