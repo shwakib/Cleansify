@@ -75,7 +75,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ accountType }) => {
         } else {
           navigate(`/Dashboard/${user.user.uid}`)
         }
+        setLoading(false)
       } catch (error) {
+        setLoading(false)
         console.error('Error signing in:', error)
       }
       setLoading(false)
@@ -110,13 +112,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ accountType }) => {
             />
           </Grid>
           <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="success"
-              size="large"
-              fullWidth
-              type="submit"
-            >
             <Button
               variant="contained"
               color="success"
