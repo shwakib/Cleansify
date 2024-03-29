@@ -17,42 +17,85 @@ import {
   generateYearsArray
 } from '../../utils/helper'
 import { useFormik } from 'formik'
-import { StateNames } from '../../constants/common'
+import { AccountTypes, StateNames } from '../../constants/common'
+import { addDoc, collection, getFirestore } from 'firebase/firestore'
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
+import app from '../../config/firebase.config'
+import { FamilyMembers, PersonalUser } from '../../models/user.model'
+import Backdrop from '../../components/Backdrop'
 
-interface FamilyMembers {
-  fullName: string
-  nationalId: string
-  dateOfBirth: {
-    day: string
-    month: string
-    year: string
-  }
+interface FormValues extends Omit<PersonalUser, 'userId'> {
+  password: string
 }
 
 const PersonalSignupForm = () => {
   const [familyMembers, setFamilyMembers] = useState<Array<FamilyMembers>>([])
+  const [showForm, setShowForm] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
 
-  const [showForm, setShowForm] = useState(false)
+  const auth = getAuth(app)
+  const db = getFirestore(app)
+
+  const initialValues: FormValues = {
+    accountType: AccountTypes.PERSONAL,
+    fullName: '',
+    dateOfBirth: {
+      day: '',
+      month: '',
+      year: ''
+    },
+    nationalId: '',
+    address: {
+      fullAddress: '',
+      state: ''
+    },
+    email: '',
+    phoneNumber: '',
+    password: ''
+  }
 
   const formik = useFormik({
-    initialValues: {
-      fullName: '',
-      dateOfBirth: {
-        day: '',
-        month: '',
-        year: ''
-      },
-      nationalId: '',
-      address: {
-        fullAdress: '',
-        state: ''
-      },
-      email: '',
-      phoneNumber: '',
-      password: ''
-    },
-    onSubmit: values => {
-      console.log(values)
+    initialValues,
+    onSubmit: async values => {
+      setLoading(true)
+      try {
+        const userCredentials = await createUserWithEmailAndPassword(
+          auth,
+          values.email,
+          values.password
+        )
+
+        const user = userCredentials.user
+
+        try {
+          const userDoc: PersonalUser = {
+            accountType: AccountTypes.PERSONAL,
+            userId: user.uid,
+            fullName: values.fullName,
+            dateOfBirth: {
+              day: values.dateOfBirth.day,
+              month: values.dateOfBirth.month,
+              year: values.dateOfBirth.year
+            },
+            address: {
+              fullAddress: values.address.fullAddress,
+              state: values.address.state
+            },
+            email: values.email,
+            phoneNumber: values.phoneNumber,
+            nationalId: values.nationalId,
+            familyMembers
+          }
+          if (user) {
+            await addDoc(collection(db, 'users'), userDoc)
+          }
+          formik.resetForm()
+          setFamilyMembers([])
+        } catch (error) {
+          await user.delete()
+        }
+      } catch (error) {}
+      setLoading(false)
     }
   })
 
@@ -67,8 +110,6 @@ const PersonalSignupForm = () => {
       nationalId: ''
     },
     onSubmit: values => {
-      console.log(values)
-
       const newMember: FamilyMembers = {
         fullName: values.fullName,
         nationalId: values.nationalId,
@@ -89,6 +130,7 @@ const PersonalSignupForm = () => {
 
   return (
     <Fragment>
+      {loading ? <Backdrop open={loading} /> : null}
       <form onSubmit={formik.handleSubmit}>
         <Grid container xs={12} spacing={5}>
           {/* 1st row start */}
@@ -163,9 +205,9 @@ const PersonalSignupForm = () => {
                 label="Full address"
                 variant="standard"
                 fullWidth
-                value={formik.values.address.fullAdress}
+                value={formik.values.address.fullAddress}
                 onChange={formik.handleChange}
-                name="address.fullAdress"
+                name="address.fullAddress"
               />
             </Grid>
             <Grid item xs={12} md={4}>

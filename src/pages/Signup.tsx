@@ -29,7 +29,7 @@ const Signup = () => {
   return (
     <Stack width={'100%'} gap={5}>
       <form onSubmit={formik.handleSubmit}>
-        <Grid container xs={12}>
+        <Grid container>
           <Grid item xs={12} md={6}>
             <Dropdown
               value={formik.values.accountType}

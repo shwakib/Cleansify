@@ -1,5 +1,5 @@
 import { Grid, Stack } from '@mui/material'
-import { accountTypes } from '../constants/common'
+import { AccountTypes, accountTypes } from '../constants/common'
 import React from 'react'
 import { useFormik } from 'formik'
 import Dropdown from '../components/Dropdown'
@@ -31,7 +31,9 @@ const Login = () => {
           </Grid>
         </Grid>
       </form>
-      {formik.values.accountType && <LoginForm />}
+      {formik.values.accountType && (
+        <LoginForm accountType={formik.values.accountType as AccountTypes} />
+      )}
     </Stack>
   )
 }
