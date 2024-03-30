@@ -16,6 +16,8 @@ import Backdrop from '../components/Backdrop'
 import { AccountTypes } from '../constants/common'
 import DataForm from '../components/DataForm'
 import { getCurrentMonthYear } from '../utils/helper'
+import DataTables from '../components/DataTables'
+import { DataTable } from 'models/data.model'
 
 const Dashboard = () => {
   const { userId } = useParams()
@@ -26,6 +28,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState<boolean>(false)
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
+  const [data, setData] = useState<DataTable>()
 
   const getUser = async (uid: string) => {
     setLoading(true)
@@ -78,7 +81,28 @@ const Dashboard = () => {
       }
     }
 
+    const getDocsByYear = async () => {
+      const q = query(collection(db, 'data'), where('userId', '==', userId))
+      const querySnapshot = await getDocs(q)
+
+      const docsByYear: DataTable = {}
+
+      // Iterate over each document in the query snapshot
+      querySnapshot.forEach(doc => {
+        // Extract the year part from the date property
+        const year = doc.data().date.split('/')[1]
+
+        if (!docsByYear[year]) {
+          docsByYear[year] = []
+        }
+
+        docsByYear[year].push(doc.data())
+      })
+      setData(docsByYear)
+    }
+
     isSubmitted()
+    getDocsByYear()
   }, [user, formSubmitted])
 
   useEffect(() => {
@@ -117,6 +141,9 @@ const Dashboard = () => {
           ) : (
             <DataForm onFormSubmit={() => setFormSubmitted(true)} />
           )}
+          <Grid item container xs={12}>
+            <DataTables {...data} />
+          </Grid>
         </Grid>
       )}
     </>
