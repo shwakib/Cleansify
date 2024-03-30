@@ -32,6 +32,13 @@ const theme = createTheme({
           width: '100%'
         }
       }
+    },
+    MuiAccordion: {
+      styleOverrides: {
+        root: {
+          width: '100%'
+        }
+      }
     }
   }
 })
