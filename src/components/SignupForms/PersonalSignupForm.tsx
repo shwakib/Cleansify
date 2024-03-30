@@ -11,7 +11,7 @@ import {
   Typography
 } from '@mui/material'
 import Dropdown from '../../components/Dropdown'
-import React, { Fragment, useState } from 'react'
+import React, { useState } from 'react'
 import {
   generateDaysInMonth,
   generateMonthsArray,
