@@ -1,6 +1,6 @@
-import { Backdrop, Button, Grid, TextField } from '@mui/material'
+import { Alert, Backdrop, Button, Grid, TextField } from '@mui/material'
 import app from '../../config/firebase.config'
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import { useFormik } from 'formik'
 import React, { useContext, useState } from 'react'
 import UserContext from '../../state/user/user.context'
@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore'
 import { AccountTypes } from '../../constants/common'
 import { useNavigate } from 'react-router-dom'
+import * as yup from 'yup'
 
 interface LoginFormProps {
   accountType: AccountTypes
@@ -22,6 +23,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ accountType }) => {
   const { setUser } = useContext(UserContext)
 
   const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string>('')
 
   const navigate = useNavigate()
 
@@ -46,6 +48,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ accountType }) => {
       console.error('Error getting user:', error)
     }
   }
+
+  const validationSchema = yup.object({
+    email: yup
+      .string()
+      .email('Invalid email address')
+      .required('Email is required'),
+    password: yup
+      .string()
+      .min(6, 'Password must be at least 6 characters')
+      .required('Password is required')
+  })
 
   const formik = useFormik({
     initialValues: {
@@ -72,21 +85,28 @@ const LoginForm: React.FC<LoginFormProps> = ({ accountType }) => {
         )
         if (currentUser === null) {
           setUser(null)
+          setError('User does not exist.')
+          signOut(auth)
         } else {
           navigate(`/Dashboard/${user.user.uid}`)
         }
         setLoading(false)
       } catch (error) {
         setLoading(false)
+        setError((error as Error).message)
         console.error('Error signing in:', error)
       }
       setLoading(false)
-    }
+    },
+    validationSchema,
+    validateOnBlur: false,
+    validateOnMount: false
   })
 
   return (
     <>
       {loading ? <Backdrop open={loading} /> : null}
+      {error ? <Alert severity="error">{error}</Alert> : null}
       <form onSubmit={formik.handleSubmit}>
         <Grid container md={6} xs={12} spacing={5}>
           <Grid item xs={12}>
@@ -98,6 +118,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ accountType }) => {
               value={formik.values.email}
               onChange={formik.handleChange}
               name="email"
+              onBlur={formik.handleBlur}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
             />
           </Grid>
           <Grid item xs={12}>
@@ -109,6 +132,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ accountType }) => {
               value={formik.values.password}
               onChange={formik.handleChange}
               name="password"
+              onBlur={formik.handleBlur}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              helperText={formik.touched.password && formik.errors.password}
             />
           </Grid>
           <Grid item xs={12}>

@@ -1,6 +1,7 @@
 import {
   BaseSelectProps,
   FormControl,
+  FormHelperText,
   InputLabel,
   MenuItem,
   Select
@@ -13,6 +14,7 @@ export interface DropdownProps extends BaseSelectProps {
   value: string
   onChange: (e) => void
   options: GenericItem[]
+  errorMessage?: string
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -22,10 +24,12 @@ const Dropdown: React.FC<DropdownProps> = ({
   value,
   name,
   fullWidth,
+  error,
+  errorMessage,
   ...props
 }) => {
   return (
-    <FormControl variant="standard" fullWidth={fullWidth}>
+    <FormControl variant="standard" fullWidth={fullWidth} error={error}>
       <InputLabel id="demo-simple-select-standard-label">{label}</InputLabel>
       <Select
         value={value}
@@ -42,6 +46,7 @@ const Dropdown: React.FC<DropdownProps> = ({
           )
         })}
       </Select>
+      <FormHelperText>{error && errorMessage}</FormHelperText>
     </FormControl>
   )
 }

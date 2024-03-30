@@ -156,7 +156,7 @@ const Dashboard = () => {
               </>
             ) : (
               <Alert severity="warning">
-                You have made any submissions yet.
+                You have not made any submissions yet.
               </Alert>
             )}
           </Grid>
