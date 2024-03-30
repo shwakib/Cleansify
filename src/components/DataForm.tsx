@@ -6,7 +6,7 @@ import {
   Typography
 } from '@mui/material'
 import { useFormik } from 'formik'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { getCurrentMonthYear } from '../utils/helper'
 import UserContext from '../state/user/user.context'
 import { addDoc, collection, getFirestore } from '@firebase/firestore'
@@ -18,15 +18,25 @@ type FormData = {
   gasUsage: string
   fuelUsage: string
   avgMilesDriven: string
-  file: File
+  electricityBill: File
+  gasBill: File
+  fuelBill: File
+  carBill: File
 }
 
-interface DataDoc extends Omit<FormData, 'file'> {
+interface DataDoc
+  extends Omit<
+    FormData,
+    'electricityBill' | 'gasBill' | 'fuelBill' | 'carBill'
+  > {
   userId: string
   accountType: string
   carbonFootPrint: string
   date: string
-  filePath: string
+  electricityBillFilePath: string
+  gasBillFilePath: string
+  fuelBillFilePath: string
+  carBillFilePath: string
 }
 
 const DataForm = () => {
@@ -41,15 +51,40 @@ const DataForm = () => {
     gasUsage: '',
     fuelUsage: '',
     avgMilesDriven: '',
-    file: null as unknown as File
+    electricityBill: null as unknown as File,
+    gasBill: null as unknown as File,
+    fuelBill: null as unknown as File,
+    carBill: null as unknown as File
   }
 
   const formik = useFormik({
     initialValues,
     onSubmit: async values => {
-      let fileRef
+      let electricityFileRef
+      let gasFileRef
+      let fuelFileRef
+      let carFileRef
 
       // Check if not submitted, then proceed to submit form and upload file
+      const electricityBillFilePath = `files/${
+        user?.userId
+      }/${getCurrentMonthYear().replace('/', '-')}/electricity/${
+        values.electricityBill?.name
+      }`
+
+      const gasBillFilePath = `files/${
+        user?.userId
+      }/${getCurrentMonthYear().replace('/', '-')}/gas/${values.gasBill?.name}`
+
+      const fuelBillFilePath = `files/${
+        user?.userId
+      }/${getCurrentMonthYear().replace('/', '-')}/fuel/${
+        values.fuelBill?.name
+      }`
+
+      const carBillFilePath = `files/${
+        user?.userId
+      }/${getCurrentMonthYear().replace('/', '-')}/car/${values.carBill?.name}`
 
       try {
         const dataDoc: DataDoc = {
@@ -61,9 +96,10 @@ const DataForm = () => {
           avgMilesDriven: values.avgMilesDriven,
           carbonFootPrint,
           date: getCurrentMonthYear(),
-          filePath: `files/${user?.userId}/${getCurrentMonthYear()}/${
-            values.file?.name
-          }`
+          electricityBillFilePath,
+          gasBillFilePath,
+          fuelBillFilePath,
+          carBillFilePath
         }
 
         await addDoc(collection(db, 'data'), dataDoc)
@@ -72,37 +108,46 @@ const DataForm = () => {
         const storage = getStorage()
         const storageRef = ref(storage)
 
-        fileRef = ref(
-          storageRef,
-          `files/${user?.userId}/bills/${getCurrentMonthYear()}/${
-            values.file?.name
-          }`
-        )
-        await uploadBytes(fileRef, values.file)
-      } catch (error) {}
+        electricityFileRef = ref(storageRef, electricityBillFilePath)
+        gasFileRef = ref(storageRef, gasBillFilePath)
+        fuelFileRef = ref(storageRef, fuelBillFilePath)
+        carFileRef = ref(storageRef, carBillFilePath)
+
+        await uploadBytes(electricityFileRef, values.electricityBill)
+        await uploadBytes(gasFileRef, values.gasBill)
+        await uploadBytes(fuelFileRef, values.fuelBill)
+        await uploadBytes(carFileRef, values.carBill)
+      } catch (error) {
+        console.log(error)
+      }
     }
   })
 
-  console.log(getCurrentMonthYear())
-
   const calculate = () => {
+    const result = `${
+      Number(formik.values.electricUsage) * 105 +
+      Number(formik.values.gasUsage) * 105 +
+      Number(formik.values.fuelUsage) * 113 +
+      Number(formik.values.avgMilesDriven) * 52
+    } lbs`
+    setCarbonFootPrint(result)
+  }
+
+  useEffect(() => {
     if (
       formik.values.electricUsage &&
       formik.values.fuelUsage &&
       formik.values.gasUsage &&
       formik.values.avgMilesDriven
     ) {
-      const result = `${
-        Number(formik.values.electricUsage) * 105 +
-        Number(formik.values.gasUsage) * 105 +
-        Number(formik.values.fuelUsage) * 113 +
-        Number(formik.values.avgMilesDriven) * 52
-      } lbs`
-      setCarbonFootPrint(result)
-      return result
+      calculate()
     }
-    return 'Please enter the required fields'
-  }
+  }, [
+    formik.values.electricUsage,
+    formik.values.fuelUsage,
+    formik.values.gasUsage,
+    formik.values.avgMilesDriven
+  ])
 
   return (
     <Grid item container xs={12} md={6} rowSpacing={3}>
@@ -175,22 +220,31 @@ const DataForm = () => {
           </Grid>
           <Grid item xs={12}>
             <Typography fontWeight={'bold'}>
-              Carbon footprint: {calculate()}
+              Carbon footprint:{' '}
+              {carbonFootPrint ?? 'Please enter required values'}
             </Typography>
           </Grid>
           <Grid container item xs={12} alignItems={'center'}>
             <input
               type="file"
-              id="file"
-              name="file"
+              id="electricityBill"
+              name="electricityBill"
               accept=".pdf,.doc,.docx,.jpg,.png"
               onChange={event => {
-                formik.setFieldValue('file', event?.currentTarget?.files?.[0])
+                formik.setFieldValue(
+                  'electricityBill',
+                  event?.currentTarget?.files?.[0]
+                )
               }}
               style={{ display: 'none' }}
             />
+            <Grid item xs={12}>
+              <Typography variant="body2" fontWeight={'bold'}>
+                Upload your electricity bill
+              </Typography>
+            </Grid>
             <Grid item xs={12} md={4}>
-              <label htmlFor="file">
+              <label htmlFor="electricityBill">
                 <Button variant="contained" component="span">
                   Upload File
                 </Button>
@@ -205,8 +259,139 @@ const DataForm = () => {
                 InputProps={{
                   readOnly: true
                 }}
-                value={formik.values.file ? formik.values.file.name : ''}
-                error={formik.touched.file && Boolean(formik.errors.file)}
+                value={
+                  formik.values.electricityBill
+                    ? formik.values.electricityBill.name
+                    : ''
+                }
+                error={
+                  formik.touched.electricityBill &&
+                  Boolean(formik.errors.electricityBill)
+                }
+              />
+            </Grid>
+          </Grid>
+          <Grid container item xs={12} alignItems={'center'}>
+            <input
+              type="file"
+              id="gasBill"
+              name="gasBill"
+              accept=".pdf,.doc,.docx,.jpg,.png"
+              onChange={event => {
+                formik.setFieldValue(
+                  'gasBill',
+                  event?.currentTarget?.files?.[0]
+                )
+              }}
+              style={{ display: 'none' }}
+            />
+            <Grid item xs={12}>
+              <Typography variant="body2" fontWeight={'bold'}>
+                Upload your gas bill
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <label htmlFor="gasBill">
+                <Button variant="contained" component="span">
+                  Upload File
+                </Button>
+              </label>
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <TextField
+                variant="outlined"
+                size="small"
+                fullWidth
+                margin="normal"
+                InputProps={{
+                  readOnly: true
+                }}
+                value={formik.values.gasBill ? formik.values.gasBill.name : ''}
+                error={formik.touched.gasBill && Boolean(formik.errors.gasBill)}
+              />
+            </Grid>
+          </Grid>
+          <Grid container item xs={12} alignItems={'center'}>
+            <input
+              type="file"
+              id="fuelBill"
+              name="fuelBill"
+              accept=".pdf,.doc,.docx,.jpg,.png"
+              onChange={event => {
+                formik.setFieldValue(
+                  'fuelBill',
+                  event?.currentTarget?.files?.[0]
+                )
+              }}
+              style={{ display: 'none' }}
+            />
+            <Grid item xs={12}>
+              <Typography variant="body2" fontWeight={'bold'}>
+                Upload your fuel bill
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <label htmlFor="fuelBill">
+                <Button variant="contained" component="span">
+                  Upload File
+                </Button>
+              </label>
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <TextField
+                variant="outlined"
+                size="small"
+                fullWidth
+                margin="normal"
+                InputProps={{
+                  readOnly: true
+                }}
+                value={
+                  formik.values.fuelBill ? formik.values.fuelBill.name : ''
+                }
+                error={
+                  formik.touched.fuelBill && Boolean(formik.errors.fuelBill)
+                }
+              />
+            </Grid>
+          </Grid>
+          <Grid container item xs={12} alignItems={'center'}>
+            <input
+              type="file"
+              id="carBill"
+              name="carBill"
+              accept=".pdf,.doc,.docx,.jpg,.png"
+              onChange={event => {
+                formik.setFieldValue(
+                  'carBill',
+                  event?.currentTarget?.files?.[0]
+                )
+              }}
+              style={{ display: 'none' }}
+            />
+            <Grid item xs={12}>
+              <Typography variant="body2" fontWeight={'bold'}>
+                Upload your car bill
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <label htmlFor="carBill">
+                <Button variant="contained" component="span">
+                  Upload File
+                </Button>
+              </label>
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <TextField
+                variant="outlined"
+                size="small"
+                fullWidth
+                margin="normal"
+                InputProps={{
+                  readOnly: true
+                }}
+                value={formik.values.carBill ? formik.values.carBill.name : ''}
+                error={formik.touched.carBill && Boolean(formik.errors.carBill)}
               />
             </Grid>
           </Grid>
