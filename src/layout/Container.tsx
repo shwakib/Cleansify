@@ -21,7 +21,7 @@ const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
 
   return (
     <div style={{ background: theme.palette.background.default }}>
-      <StyledContainer maxWidth="md">{children}</StyledContainer>
+      <StyledContainer maxWidth="lg">{children}</StyledContainer>
     </div>
   )
 }
