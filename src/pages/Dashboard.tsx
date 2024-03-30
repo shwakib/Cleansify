@@ -28,7 +28,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState<boolean>(false)
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
-  const [data, setData] = useState<DataTable>()
+  const [data, setData] = useState<DataTable | null>(null)
 
   const getUser = async (uid: string) => {
     setLoading(true)
@@ -85,11 +85,14 @@ const Dashboard = () => {
       const q = query(collection(db, 'data'), where('userId', '==', userId))
       const querySnapshot = await getDocs(q)
 
+      if (querySnapshot.empty) {
+        setData(null)
+        return
+      }
+
       const docsByYear: DataTable = {}
 
-      // Iterate over each document in the query snapshot
       querySnapshot.forEach(doc => {
-        // Extract the year part from the date property
         const year = doc.data().date.split('/')[1]
 
         if (!docsByYear[year]) {
@@ -114,7 +117,7 @@ const Dashboard = () => {
       {loading ? (
         <Backdrop open={loading} />
       ) : (
-        <Grid container spacing={3}>
+        <Grid container spacing={5}>
           <Grid item xs={12}>
             {user?.accountType === AccountTypes.ORGANIZATION ? (
               <Typography variant="h4">Your Organization Account</Typography>
@@ -142,7 +145,20 @@ const Dashboard = () => {
             <DataForm onFormSubmit={() => setFormSubmitted(true)} />
           )}
           <Grid item container xs={12}>
-            <DataTables {...data} />
+            {data ? (
+              <>
+                <Grid item xs={12}>
+                  <Typography variant="h5" fontWeight={'bold'} gutterBottom>
+                    Your submission history
+                  </Typography>
+                </Grid>
+                <DataTables {...data} />
+              </>
+            ) : (
+              <Alert severity="warning">
+                You have made any submissions yet.
+              </Alert>
+            )}
           </Grid>
         </Grid>
       )}
