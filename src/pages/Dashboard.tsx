@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material'
+import { Alert, Grid, Typography } from '@mui/material'
 import React, { useContext, useEffect, useState } from 'react'
 import UserContext from '../state/user/user.context'
 import { OrgUser, PersonalUser } from '../models/user.model'
@@ -15,6 +15,7 @@ import PersonalInfo from '../components/PersonalInfo'
 import Backdrop from '../components/Backdrop'
 import { AccountTypes } from '../constants/common'
 import DataForm from '../components/DataForm'
+import { getCurrentMonthYear } from '../utils/helper'
 
 const Dashboard = () => {
   const { userId } = useParams()
@@ -23,6 +24,8 @@ const Dashboard = () => {
   const { user, setUser } = useContext(UserContext)
 
   const [loading, setLoading] = useState<boolean>(false)
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
 
   const getUser = async (uid: string) => {
     setLoading(true)
@@ -55,6 +58,30 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
+    const isSubmitted = async () => {
+      const userId = user?.userId
+      const currentMonthYear = getCurrentMonthYear()
+
+      if (userId && currentMonthYear) {
+        const q = query(
+          collection(db, 'data'),
+          where('userId', '==', userId),
+          where('date', '==', currentMonthYear)
+        )
+
+        const querySnapshot = await getDocs(q)
+        if (!querySnapshot.empty) {
+          setIsSubmitted(true)
+        } else {
+          setIsSubmitted(false)
+        }
+      }
+    }
+
+    isSubmitted()
+  }, [user, formSubmitted])
+
+  useEffect(() => {
     if (userId) getUser(userId)
   }, [userId])
 
@@ -81,7 +108,15 @@ const Dashboard = () => {
             dateOfBirth={(user as PersonalUser)?.dateOfBirth}
             nationalId={(user as PersonalUser)?.nationalId}
           />
-          <DataForm />
+          {isSubmitted ? (
+            <Grid item container xs={12} md={6}>
+              <Alert severity="success">
+                You have made the submission for this month.
+              </Alert>
+            </Grid>
+          ) : (
+            <DataForm onFormSubmit={() => setFormSubmitted(true)} />
+          )}
         </Grid>
       )}
     </>
