@@ -2,7 +2,7 @@ import { Grid, Paper, Stack, Typography, TypographyProps } from '@mui/material'
 import React from 'react'
 import { PersonalInfoProps } from 'types/personalInfo.type'
 
-const StyledLabel: React.FC<TypographyProps> = ({
+export const StyledLabel: React.FC<TypographyProps> = ({
   variant = 'body2',
   fontWeight = 'bold',
   ...props

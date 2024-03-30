@@ -13,12 +13,13 @@ import { addDoc, collection, getFirestore } from '@firebase/firestore'
 import app from '../config/firebase.config'
 import { getStorage, ref, uploadBytes } from '@firebase/storage'
 import Backdrop from './Backdrop'
+import { DataDoc } from '../models/data.model'
 
 interface DataFormProps {
   onFormSubmit: () => void
 }
 
-type FormData = {
+export type FormData = {
   electricUsage: string
   gasUsage: string
   fuelUsage: string
@@ -27,21 +28,6 @@ type FormData = {
   gasBill: File
   fuelBill: File
   carBill: File
-}
-
-interface DataDoc
-  extends Omit<
-    FormData,
-    'electricityBill' | 'gasBill' | 'fuelBill' | 'carBill'
-  > {
-  userId: string
-  accountType: string
-  carbonFootPrint: string
-  date: string
-  electricityBillFilePath: string
-  gasBillFilePath: string
-  fuelBillFilePath: string
-  carBillFilePath: string
 }
 
 const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
@@ -101,10 +87,10 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
         const dataDoc: DataDoc = {
           userId: user?.userId ?? '',
           accountType: user?.accountType ?? '',
-          electricUsage: values.electricUsage,
-          gasUsage: values.gasUsage,
-          fuelUsage: values.fuelUsage,
-          avgMilesDriven: values.avgMilesDriven,
+          electricUsage: `${values.electricUsage} kWh`,
+          gasUsage: `${values.gasUsage} ft³`,
+          fuelUsage: `${values.fuelUsage} gal`,
+          avgMilesDriven: `${values.avgMilesDriven} mi`,
           carbonFootPrint,
           date: getCurrentMonthYear(),
           electricityBillFilePath,

@@ -63,3 +63,22 @@ export function getCurrentMonthYear() {
   const year = now.getFullYear()
   return `${month}/${year}`
 }
+
+export const getMonthName = date => {
+  const monthNumber = parseInt(date.split('/')[0])
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ]
+  return months[monthNumber - 1]
+}
