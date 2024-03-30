@@ -2,7 +2,8 @@ import {
   Accordion as MuiAccordion,
   AccordionDetails,
   AccordionSummary,
-  AccordionProps as MuiAccordionProps
+  AccordionProps as MuiAccordionProps,
+  Typography
 } from '@mui/material'
 import React from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -24,7 +25,7 @@ const Accordion: React.FC<AccordionProps> = ({
   return (
     <MuiAccordion key={key} {...props}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        {title}
+        <Typography variant="h6">{title}</Typography>
       </AccordionSummary>
       <AccordionDetails>{children}</AccordionDetails>
     </MuiAccordion>
