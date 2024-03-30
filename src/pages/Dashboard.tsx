@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material'
+import { Alert, Grid, Typography } from '@mui/material'
 import React, { useContext, useEffect, useState } from 'react'
 import UserContext from '../state/user/user.context'
 import { OrgUser, PersonalUser } from '../models/user.model'
@@ -14,6 +14,8 @@ import app from '../config/firebase.config'
 import PersonalInfo from '../components/PersonalInfo'
 import Backdrop from '../components/Backdrop'
 import { AccountTypes } from '../constants/common'
+import DataForm from '../components/DataForm'
+import { getCurrentMonthYear } from '../utils/helper'
 
 const Dashboard = () => {
   const { userId } = useParams()
@@ -22,6 +24,8 @@ const Dashboard = () => {
   const { user, setUser } = useContext(UserContext)
 
   const [loading, setLoading] = useState<boolean>(false)
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
 
   const getUser = async (uid: string) => {
     setLoading(true)
@@ -42,7 +46,6 @@ const Dashboard = () => {
         where('userId', '==', uid)
       )
       const orgUserSnapshot = await getDocs(orgUserQuery)
-      console.log(orgUserSnapshot.docs[0])
 
       if (!orgUserSnapshot.empty) {
         setUser(orgUserSnapshot.docs[0].data() as OrgUser)
@@ -55,6 +58,30 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
+    const isSubmitted = async () => {
+      const userId = user?.userId
+      const currentMonthYear = getCurrentMonthYear()
+
+      if (userId && currentMonthYear) {
+        const q = query(
+          collection(db, 'data'),
+          where('userId', '==', userId),
+          where('date', '==', currentMonthYear)
+        )
+
+        const querySnapshot = await getDocs(q)
+        if (!querySnapshot.empty) {
+          setIsSubmitted(true)
+        } else {
+          setIsSubmitted(false)
+        }
+      }
+    }
+
+    isSubmitted()
+  }, [user, formSubmitted])
+
+  useEffect(() => {
     if (userId) getUser(userId)
   }, [userId])
 
@@ -63,7 +90,7 @@ const Dashboard = () => {
       {loading ? (
         <Backdrop open={loading} />
       ) : (
-        <Grid container rowSpacing={3}>
+        <Grid container spacing={3}>
           <Grid item xs={12}>
             {user?.accountType === AccountTypes.ORGANIZATION ? (
               <Typography variant="h4">Your Organization Account</Typography>
@@ -81,6 +108,15 @@ const Dashboard = () => {
             dateOfBirth={(user as PersonalUser)?.dateOfBirth}
             nationalId={(user as PersonalUser)?.nationalId}
           />
+          {isSubmitted ? (
+            <Grid item container xs={12} md={6}>
+              <Alert severity="success">
+                You have made the submission for this month.
+              </Alert>
+            </Grid>
+          ) : (
+            <DataForm onFormSubmit={() => setFormSubmitted(true)} />
+          )}
         </Grid>
       )}
     </>

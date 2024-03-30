@@ -27,7 +27,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
   nationalId
 }) => {
   return (
-    <Grid item container xs={12} md={6}>
+    <Grid item container xs={12} md={6} height={'max-content'}>
       <Paper elevation={3} sx={{ padding: '30px' }}>
         <Grid container item spacing={2}>
           <Grid item spacing={1} container xs={12}>
