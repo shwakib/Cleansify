@@ -24,6 +24,14 @@ const theme = createTheme({
           }
         }
       }
+    },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          height: 'max-content',
+          width: '100%'
+        }
+      }
     }
   }
 })
