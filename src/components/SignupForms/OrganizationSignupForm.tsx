@@ -21,6 +21,7 @@ import app from '../../config/firebase.config'
 import { OrgUser } from '../../models/user.model'
 import Backdrop from '../../components/Backdrop'
 import * as yup from 'yup'
+import { useNavigate } from 'react-router'
 
 interface Factory {
   address: {
@@ -40,6 +41,7 @@ const OrganizationSignupForm = () => {
   const [factories, setFactories] = useState<Factory[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
+  const navigate = useNavigate()
 
   const auth = getAuth(app)
   const db = getFirestore(app)
@@ -113,6 +115,8 @@ const OrganizationSignupForm = () => {
           // Upload the file to Firebase Storage
           fileRef = ref(storageRef, `files/${user.uid}/${values.file?.name}`)
           await uploadBytes(fileRef, values.file)
+
+          navigate('/login')
           formik.resetForm()
         } catch (error) {
           setError((error as Error).message)

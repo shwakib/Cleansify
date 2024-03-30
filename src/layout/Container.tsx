@@ -12,6 +12,9 @@ import {
 import UserContext from '../state/user/user.context'
 import { OrgUser, PersonalUser } from '../models/user.model'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
+import app from '../config/firebase.config'
+import { getAuth, signOut } from '@firebase/auth'
+import { useNavigate } from 'react-router'
 
 interface AppContainerProps {
   children: ReactNode
@@ -37,7 +40,15 @@ const StyledAppbar = styled(Container)(() => ({
 const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
   const theme = useTheme()
 
-  const { user } = useContext(UserContext)
+  const { user, setUser } = useContext(UserContext)
+  const auth = getAuth(app)
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    await signOut(auth)
+    setUser(null)
+    navigate('/')
+  }
 
   return (
     <div style={{ background: theme.palette.background.default }}>
@@ -56,6 +67,7 @@ const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
                 variant="text"
                 color="error"
                 startIcon={<ExitToAppIcon style={{ fill: 'white' }} />}
+                onClick={handleLogout}
               >
                 <Typography variant="body1" fontWeight={'bold'} color={'white'}>
                   Logout

@@ -23,45 +23,16 @@ const Dashboard = () => {
   const { userId } = useParams()
   const db = getFirestore(app)
 
-  const { user, setUser } = useContext(UserContext)
+  const { user } = useContext(UserContext)
 
   const [loading, setLoading] = useState<boolean>(false)
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
   const [data, setData] = useState<DataTable | null>(null)
 
-  const getUser = async (uid: string) => {
-    setLoading(true)
-    try {
-      const userQuery = query(
-        collection(db, 'users'),
-        where('userId', '==', uid)
-      )
-      const userSnapshot = await getDocs(userQuery)
-
-      if (!userSnapshot.empty) {
-        setUser(userSnapshot.docs[0].data() as PersonalUser)
-        setLoading(false)
-      }
-
-      const orgUserQuery = query(
-        collection(db, 'orgUsers'),
-        where('userId', '==', uid)
-      )
-      const orgUserSnapshot = await getDocs(orgUserQuery)
-
-      if (!orgUserSnapshot.empty) {
-        setUser(orgUserSnapshot.docs[0].data() as OrgUser)
-        setLoading(false)
-      }
-    } catch (error) {
-      setLoading(false)
-      throw error
-    }
-  }
-
   useEffect(() => {
     const isSubmitted = async () => {
+      setLoading(true)
       const userId = user?.userId
       const currentMonthYear = getCurrentMonthYear()
 
@@ -79,9 +50,11 @@ const Dashboard = () => {
           setIsSubmitted(false)
         }
       }
+      setLoading(false)
     }
 
     const getDocsByYear = async () => {
+      setLoading(true)
       const q = query(collection(db, 'data'), where('userId', '==', userId))
       const querySnapshot = await getDocs(q)
 
@@ -102,15 +75,12 @@ const Dashboard = () => {
         docsByYear[year].push(doc.data())
       })
       setData(docsByYear)
+      setLoading(false)
     }
 
     isSubmitted()
     getDocsByYear()
   }, [user, formSubmitted])
-
-  useEffect(() => {
-    if (userId) getUser(userId)
-  }, [userId])
 
   return (
     <>

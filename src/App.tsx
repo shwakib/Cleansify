@@ -8,21 +8,29 @@ import Signup from './pages/Signup'
 import Login from './pages/Login'
 import UserProvider from './state/user/user.provider'
 import Dashboard from './pages/Dashboard'
+import PrivateRoute from './components/PrivateRoute'
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <UserProvider>
-        <AppContainer>
-          <Router>
+        <Router>
+          <AppContainer>
             <Routes>
               <Route path="/" element={<AuthPage />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/Dashboard/:userId" element={<Dashboard />} />
+              <Route
+                path="/Dashboard/:userId"
+                element={
+                  <PrivateRoute>
+                    <Dashboard />
+                  </PrivateRoute>
+                }
+              />
             </Routes>
-          </Router>
-        </AppContainer>
+          </AppContainer>
+        </Router>
       </UserProvider>
     </ThemeProvider>
   )

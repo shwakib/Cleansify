@@ -14,6 +14,7 @@ import {
 import { AccountTypes } from '../../constants/common'
 import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
+import { OrgUser, PersonalUser } from '../../models/user.model'
 
 interface LoginFormProps {
   accountType: AccountTypes
@@ -86,9 +87,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ accountType }) => {
         if (currentUser === null) {
           setUser(null)
           setError('User does not exist.')
-          signOut(auth)
+          await signOut(auth)
         } else {
-          navigate(`/Dashboard/${user.user.uid}`)
+          if (accountType === AccountTypes.ORGANIZATION) {
+            setUser(currentUser as OrgUser)
+          } else if (accountType === AccountTypes.PERSONAL) {
+            setUser(currentUser as PersonalUser)
+          }
+          navigate(`/Dashboard/${user.user.uid}`, { replace: true })
         }
         setLoading(false)
       } catch (error) {
