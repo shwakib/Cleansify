@@ -10,6 +10,7 @@ export interface DataDoc
   accountType: string
   carbonFootPrint: string
   date: string
+  city: string
   electricityBillFilePath: string
   gasBillFilePath: string
   fuelBillFilePath: string

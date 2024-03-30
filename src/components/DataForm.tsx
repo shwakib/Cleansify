@@ -92,6 +92,7 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
           fuelUsage: `${values.fuelUsage} gal`,
           avgMilesDriven: `${values.avgMilesDriven} mi`,
           carbonFootPrint,
+          city: user?.address.state ?? '',
           date: getCurrentMonthYear(),
           electricityBillFilePath,
           gasBillFilePath,
