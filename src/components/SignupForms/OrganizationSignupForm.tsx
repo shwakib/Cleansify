@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Grid,
   Table,
@@ -38,6 +39,7 @@ const OrganizationSignupForm = () => {
   const [showForm, setShowForm] = useState(false)
   const [factories, setFactories] = useState<Factory[]>([])
   const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string>('')
 
   const auth = getAuth(app)
   const db = getFirestore(app)
@@ -113,6 +115,7 @@ const OrganizationSignupForm = () => {
           await uploadBytes(fileRef, values.file)
           formik.resetForm()
         } catch (error) {
+          setError((error as Error).message)
           await user.delete()
           if (fileRef) {
             try {
@@ -124,6 +127,8 @@ const OrganizationSignupForm = () => {
           console.log(error)
         }
       } catch (err) {
+        setError((err as Error).message)
+
         if (fileRef) {
           try {
             await deleteObject(fileRef)
@@ -192,6 +197,7 @@ const OrganizationSignupForm = () => {
   return (
     <>
       {loading ? <Backdrop open={loading} /> : null}
+      {error ? <Alert severity="error">{error}</Alert> : null}
       <form>
         <Grid container xs={12} rowSpacing={3}>
           <Grid container item xs={12} spacing={5}>

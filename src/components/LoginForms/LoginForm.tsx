@@ -93,6 +93,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ accountType }) => {
         setLoading(false)
       } catch (error) {
         setLoading(false)
+        setError((error as Error).message)
         console.error('Error signing in:', error)
       }
       setLoading(false)

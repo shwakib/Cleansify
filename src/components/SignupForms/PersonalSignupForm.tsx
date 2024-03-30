@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Grid,
   Table,
@@ -33,6 +34,7 @@ const PersonalSignupForm = () => {
   const [familyMembers, setFamilyMembers] = useState<Array<FamilyMembers>>([])
   const [showForm, setShowForm] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string>('')
 
   const auth = getAuth(app)
   const db = getFirestore(app)
@@ -117,9 +119,12 @@ const PersonalSignupForm = () => {
           formik.resetForm()
           setFamilyMembers([])
         } catch (error) {
+          setError((error as Error).message)
           await user.delete()
         }
-      } catch (error) {}
+      } catch (error) {
+        setError((error as Error).message)
+      }
       setLoading(false)
     },
     validationSchema,
@@ -170,8 +175,10 @@ const PersonalSignupForm = () => {
   })
 
   return (
-    <Fragment>
+    <>
       {loading ? <Backdrop open={loading} /> : null}
+      {error ? <Alert severity="error">{error}</Alert> : null}
+
       <form onSubmit={formik.handleSubmit}>
         <Grid container xs={12} spacing={5}>
           {/* 1st row start */}
@@ -524,7 +531,7 @@ const PersonalSignupForm = () => {
           </Grid>
         </Grid>
       </form>
-    </Fragment>
+    </>
   )
 }
 
