@@ -378,7 +378,7 @@ const PersonalSignupForm = () => {
               size="large"
               type="submit"
             >
-              Submit
+              Sign up
             </Button>
           </Grid>
         </Grid>

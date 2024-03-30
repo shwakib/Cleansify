@@ -354,7 +354,7 @@ const OrganizationSignupForm = () => {
               size="large"
               type="submit"
             >
-              Submit
+              Sign up
             </Button>
           </Grid>
         </Grid>
