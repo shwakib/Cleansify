@@ -19,6 +19,7 @@ import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage'
 import app from '../../config/firebase.config'
 import { OrgUser } from '../../models/user.model'
 import Backdrop from '../../components/Backdrop'
+import * as yup from 'yup'
 
 interface Factory {
   address: {
@@ -40,6 +41,22 @@ const OrganizationSignupForm = () => {
 
   const auth = getAuth(app)
   const db = getFirestore(app)
+
+  const validationSchema = yup.object().shape({
+    orgName: yup.string().required('Organization name is required'),
+    productType: yup.string().required('Product type is required'),
+    address: yup.object().shape({
+      fullAddress: yup.string().required('Full address is required'),
+      state: yup.string().required('State is required')
+    }),
+    email: yup.string().email('Invalid email').required('Email is required'),
+    phoneNumber: yup.string().required('Phone number is required'),
+    password: yup
+      .string()
+      .min(6, 'Password must be at least 6 characters')
+      .required('Password is required'),
+    file: yup.mixed().required('File is required')
+  })
 
   const initialValues: FormValues = {
     accountType: AccountTypes.ORGANIZATION,
@@ -117,7 +134,17 @@ const OrganizationSignupForm = () => {
         console.log(err)
       }
       setLoading(false)
-    }
+    },
+    validationSchema,
+    validateOnBlur: false,
+    validateOnMount: false
+  })
+
+  const factoryValidation = yup.object().shape({
+    address: yup.object().shape({
+      fullAddress: yup.string().required('Full address is required'),
+      state: yup.string().required('State is required')
+    })
   })
 
   const factoryFormik = useFormik({
@@ -139,7 +166,10 @@ const OrganizationSignupForm = () => {
       ])
       setShowForm(false)
       factoryFormik.resetForm()
-    }
+    },
+    validationSchema: factoryValidation,
+    validateOnBlur: false,
+    validateOnMount: false
   })
 
   const handleDownload = () => {
@@ -173,6 +203,9 @@ const OrganizationSignupForm = () => {
                 value={formik.values.orgName}
                 name="orgName"
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.orgName && Boolean(formik.errors.orgName)}
+                helperText={formik.touched.orgName && formik.errors.orgName}
               />
             </Grid>
             <Grid item xs={12} md={5}>
@@ -183,6 +216,14 @@ const OrganizationSignupForm = () => {
                 value={formik.values.productType}
                 name="productType"
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.productType &&
+                  Boolean(formik.errors.productType)
+                }
+                helperText={
+                  formik.touched.productType && formik.errors.productType
+                }
               />
             </Grid>
           </Grid>
@@ -195,6 +236,15 @@ const OrganizationSignupForm = () => {
                 value={formik.values.address.fullAddress}
                 name="address.fullAddress"
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.address?.fullAddress &&
+                  Boolean(formik.errors.address?.fullAddress)
+                }
+                helperText={
+                  formik.touched.address?.fullAddress &&
+                  formik.errors.address?.fullAddress
+                }
               />
             </Grid>
             <Grid item xs={12} md={5}>
@@ -205,6 +255,12 @@ const OrganizationSignupForm = () => {
                 name="address.state"
                 onChange={formik.handleChange}
                 options={StateNames}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.address?.state &&
+                  Boolean(formik.errors.address?.state)
+                }
+                errorMessage={formik.errors.address?.state}
               />
             </Grid>
           </Grid>
@@ -218,6 +274,14 @@ const OrganizationSignupForm = () => {
                 value={formik.values.phoneNumber}
                 name="phoneNumber"
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.phoneNumber &&
+                  Boolean(formik.errors.phoneNumber)
+                }
+                helperText={
+                  formik.touched.phoneNumber && formik.errors.phoneNumber
+                }
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -229,6 +293,9 @@ const OrganizationSignupForm = () => {
                 value={formik.values.email}
                 name="email"
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.email && Boolean(formik.errors.email)}
+                helperText={formik.touched.email && formik.errors.email}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -240,6 +307,11 @@ const OrganizationSignupForm = () => {
                 value={formik.values.password}
                 name="password"
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.password && Boolean(formik.errors.password)
+                }
+                helperText={formik.touched.password && formik.errors.password}
               />
             </Grid>
           </Grid>
@@ -253,6 +325,7 @@ const OrganizationSignupForm = () => {
                 formik.setFieldValue('file', event?.currentTarget?.files?.[0])
               }}
               style={{ display: 'none' }}
+              onBlur={formik.handleBlur}
             />
             <label htmlFor="file">
               <Button variant="contained" component="span">
@@ -272,16 +345,22 @@ const OrganizationSignupForm = () => {
                   </Button>
                 )
               }}
+              onBlur={formik.handleBlur}
               value={formik.values.file ? formik.values.file.name : ''}
               error={formik.touched.file && Boolean(formik.errors.file)}
-            />
+              helperText={
+                formik.touched.file && typeof formik.errors.file === 'string'
+                  ? formik.errors.file
+                  : ''
+              }
+            />{' '}
           </Grid>
         </Grid>
       </form>
       <Grid container item xs={12}>
         <Button
           variant="outlined"
-          onClick={() => setShowForm(true)}
+          onClick={() => setShowForm(prevState => !prevState)}
           size="medium"
         >
           Add Factory
@@ -298,6 +377,15 @@ const OrganizationSignupForm = () => {
                 name="address.fullAddress"
                 value={factoryFormik.values.address.fullAddress}
                 onChange={factoryFormik.handleChange}
+                onBlur={factoryFormik.handleBlur}
+                error={
+                  factoryFormik.touched.address?.fullAddress &&
+                  Boolean(factoryFormik.errors.address?.fullAddress)
+                }
+                helperText={
+                  factoryFormik.touched.address?.fullAddress &&
+                  factoryFormik.errors.address?.fullAddress
+                }
               />
             </Grid>
             <Grid item xs={12} md={3}>
@@ -308,6 +396,12 @@ const OrganizationSignupForm = () => {
                 name="address.state"
                 onChange={factoryFormik.handleChange}
                 options={StateNames}
+                onBlur={factoryFormik.handleBlur}
+                error={
+                  factoryFormik.touched.address?.fullAddress &&
+                  Boolean(factoryFormik.errors.address?.fullAddress)
+                }
+                errorMessage={factoryFormik.errors.address?.state}
               />
             </Grid>
             <Grid item xs={12} md={3}>

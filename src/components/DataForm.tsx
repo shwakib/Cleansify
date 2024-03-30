@@ -14,6 +14,7 @@ import app from '../config/firebase.config'
 import { getStorage, ref, uploadBytes } from '@firebase/storage'
 import Backdrop from './Backdrop'
 import { DataDoc } from '../models/data.model'
+import * as yup from 'yup'
 
 interface DataFormProps {
   onFormSubmit: () => void
@@ -37,6 +38,29 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
 
   const [carbonFootPrint, setCarbonFootPrint] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
+
+  const validationSchema = yup.object().shape({
+    electricUsage: yup.string().required('Electric usage is required'),
+    gasUsage: yup.string().required('Gas usage is required'),
+    fuelUsage: yup.string().required('Fuel usage is required'),
+    avgMilesDriven: yup.string().required('Average miles driven is required'),
+    electricityBill: yup
+      .mixed()
+      .test(
+        'fileType',
+        'Electricity bill is required',
+        value => value !== null
+      ),
+    gasBill: yup
+      .mixed()
+      .test('fileType', 'Gas bill is required', value => value !== null),
+    fuelBill: yup
+      .mixed()
+      .test('fileType', 'Fuel bill is required', value => value !== null),
+    carBill: yup
+      .mixed()
+      .test('fileType', 'Car bill is required', value => value !== null)
+  })
 
   const initialValues: FormData = {
     electricUsage: '',
@@ -123,7 +147,10 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
         console.log(error)
         setLoading(false)
       }
-    }
+    },
+    validationSchema,
+    validateOnBlur: false,
+    validateOnMount: false
   })
 
   const calculate = () => {
@@ -177,6 +204,14 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
                       <InputAdornment position="end">kWh</InputAdornment>
                     )
                   }}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.electricUsage &&
+                    Boolean(formik.errors.electricUsage)
+                  }
+                  helperText={
+                    formik.touched.electricUsage && formik.errors.electricUsage
+                  }
                 />
               </Grid>
               <Grid item xs={12}>
@@ -193,6 +228,11 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
                       <InputAdornment position="end">ft³</InputAdornment>
                     )
                   }}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.gasUsage && Boolean(formik.errors.gasUsage)
+                  }
+                  helperText={formik.touched.gasUsage && formik.errors.gasUsage}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -209,6 +249,13 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
                       <InputAdornment position="end">gal</InputAdornment>
                     )
                   }}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.fuelUsage && Boolean(formik.errors.fuelUsage)
+                  }
+                  helperText={
+                    formik.touched.fuelUsage && formik.errors.fuelUsage
+                  }
                 />
               </Grid>
               <Grid item xs={12}>
@@ -225,6 +272,15 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
                       <InputAdornment position="end">mi</InputAdornment>
                     )
                   }}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.avgMilesDriven &&
+                    Boolean(formik.errors.avgMilesDriven)
+                  }
+                  helperText={
+                    formik.touched.avgMilesDriven &&
+                    formik.errors.avgMilesDriven
+                  }
                 />
               </Grid>
               <Grid item xs={12}>
@@ -246,6 +302,7 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
                     )
                   }}
                   style={{ display: 'none' }}
+                  onBlur={formik.handleBlur}
                 />
                 <Grid item xs={12}>
                   <Typography variant="body2" fontWeight={'bold'}>
@@ -277,6 +334,13 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
                       formik.touched.electricityBill &&
                       Boolean(formik.errors.electricityBill)
                     }
+                    onBlur={formik.handleBlur}
+                    helperText={
+                      formik.touched.electricityBill &&
+                      typeof formik.errors.electricityBill === 'string'
+                        ? formik.errors.electricityBill
+                        : ''
+                    }
                   />
                 </Grid>
               </Grid>
@@ -293,6 +357,7 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
                     )
                   }}
                   style={{ display: 'none' }}
+                  onBlur={formik.handleBlur}
                 />
                 <Grid item xs={12}>
                   <Typography variant="body2" fontWeight={'bold'}>
@@ -321,6 +386,13 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
                     error={
                       formik.touched.gasBill && Boolean(formik.errors.gasBill)
                     }
+                    onBlur={formik.handleBlur}
+                    helperText={
+                      formik.touched.gasBill &&
+                      typeof formik.errors.gasBill === 'string'
+                        ? formik.errors.gasBill
+                        : ''
+                    }
                   />
                 </Grid>
               </Grid>
@@ -337,6 +409,7 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
                     )
                   }}
                   style={{ display: 'none' }}
+                  onBlur={formik.handleBlur}
                 />
                 <Grid item xs={12}>
                   <Typography variant="body2" fontWeight={'bold'}>
@@ -365,6 +438,13 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
                     error={
                       formik.touched.fuelBill && Boolean(formik.errors.fuelBill)
                     }
+                    onBlur={formik.handleBlur}
+                    helperText={
+                      formik.touched.fuelBill &&
+                      typeof formik.errors.fuelBill === 'string'
+                        ? formik.errors.fuelBill
+                        : ''
+                    }
                   />
                 </Grid>
               </Grid>
@@ -381,6 +461,7 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
                     )
                   }}
                   style={{ display: 'none' }}
+                  onBlur={formik.handleBlur}
                 />
                 <Grid item xs={12}>
                   <Typography variant="body2" fontWeight={'bold'}>
@@ -408,6 +489,13 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
                     }
                     error={
                       formik.touched.carBill && Boolean(formik.errors.carBill)
+                    }
+                    onBlur={formik.handleBlur}
+                    helperText={
+                      formik.touched.carBill &&
+                      typeof formik.errors.carBill === 'string'
+                        ? formik.errors.carBill
+                        : ''
                     }
                   />
                 </Grid>
