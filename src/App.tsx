@@ -9,6 +9,7 @@ import Login from './pages/Login'
 import UserProvider from './state/user/user.provider'
 import Dashboard from './pages/Dashboard'
 import PrivateRoute from './components/PrivateRoute'
+import PublicRoute from './components/PublicRoutes'
 
 function App() {
   return (
@@ -17,9 +18,30 @@ function App() {
         <Router>
           <AppContainer>
             <Routes>
-              <Route path="/" element={<AuthPage />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/login" element={<Login />} />
+              <Route
+                path="/"
+                element={
+                  <PublicRoute>
+                    <AuthPage />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <PublicRoute>
+                    <Signup />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                }
+              />
               <Route
                 path="/Dashboard/:userId"
                 element={
