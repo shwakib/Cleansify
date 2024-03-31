@@ -1,7 +1,7 @@
-import { Alert, Grid, Typography } from '@mui/material'
+import { Alert, Grid, /*Typography*/ } from '@mui/material'
 import React, { useContext, useEffect, useState } from 'react'
 import UserContext from '../state/user/user.context'
-import { OrgUser, PersonalUser } from '../models/user.model'
+// import { OrgUser, PersonalUser } from '../models/user.model'
 import { useParams } from 'react-router-dom'
 import {
   collection,
@@ -11,24 +11,24 @@ import {
   where
 } from 'firebase/firestore'
 import app from '../config/firebase.config'
-import PersonalInfo from '../components/PersonalInfo'
+// import PersonalInfo from '../components/PersonalInfo'
 import Backdrop from '../components/Backdrop'
-import { AccountTypes } from '../constants/common'
-// import DataForm from '../components/DataForm'
+// import { AccountTypes } from '../constants/common'
+import DataForm from '../components/DataForm'
 import { getCurrentMonthYear } from '../utils/helper'
-import DataTables from '../components/DataTables'
+// import DataTables from '../components/DataTables'
 import { DataTable } from 'models/data.model'
 
-const Dashboard = () => {
+const DataSubmit = () => {
   const { userId } = useParams()
   const db = getFirestore(app)
 
   const { user } = useContext(UserContext)
 
   const [loading, setLoading] = useState<boolean>(false)
-  const [/*isSubmitted*/, setIsSubmitted] = useState<boolean>(false)
-  const [formSubmitted, /*setFormSubmitted*/] = useState<boolean>(false)
-  const [data, setData] = useState<DataTable | null>(null)
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
+  const [/*data*/, setData] = useState<DataTable | null>(null)
 
   useEffect(() => {
     const isSubmitted = async () => {
@@ -88,24 +88,14 @@ const Dashboard = () => {
         <Backdrop open={loading} />
       ) : (
         <Grid container spacing={5}>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             {user?.accountType === AccountTypes.ORGANIZATION ? (
               <Typography variant="h4">Organization Details</Typography>
             ) : user?.accountType === AccountTypes.PERSONAL ? (
               <Typography variant="h4">User Details</Typography>
             ) : null}
-          </Grid>
-          <PersonalInfo
-            name={
-              (user as PersonalUser)?.fullName ?? (user as OrgUser)?.orgName
-            }
-            address={`${user?.address.fullAddress}, ${user?.address.state}`}
-            email={user?.email ?? ''}
-            phoneNumber={user?.phoneNumber ?? ''}
-            dateOfBirth={(user as PersonalUser)?.dateOfBirth}
-            nationalId={(user as PersonalUser)?.nationalId}
-          />
-          {/* {isSubmitted ? (
+          </Grid> */}
+          {isSubmitted ? (
             <Grid item container xs={12} md={6}>
               <Alert severity="success">
                 You have made the submission for this month.
@@ -113,8 +103,8 @@ const Dashboard = () => {
             </Grid>
           ) : (
             <DataForm onFormSubmit={() => setFormSubmitted(true)} />
-          )} */}
-          <Grid item container xs={12}>
+          )}
+          {/* <Grid item container xs={12}>
             {data ? (
               <>
                 <Grid item xs={12}>
@@ -129,11 +119,11 @@ const Dashboard = () => {
                 You have not made any submissions yet.
               </Alert>
             )}
-          </Grid>
+          </Grid> */}
         </Grid>
       )}
     </>
   )
 }
 
-export default Dashboard
+export default DataSubmit

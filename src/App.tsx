@@ -10,6 +10,7 @@ import UserProvider from './state/user/user.provider'
 import Dashboard from './pages/Dashboard'
 import PrivateRoute from './components/PrivateRoute'
 import PublicRoute from './components/PublicRoutes'
+import DataSubmit from './pages/DataSubmit'
 
 function App() {
   return (
@@ -47,6 +48,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <Dashboard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/Submit/:userId"
+                element={
+                  <PrivateRoute>
+                    <DataSubmit />
                   </PrivateRoute>
                 }
               />

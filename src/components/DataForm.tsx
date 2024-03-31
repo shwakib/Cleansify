@@ -15,6 +15,7 @@ import { getStorage, ref, uploadBytes } from '@firebase/storage'
 import Backdrop from './Backdrop'
 import { DataDoc } from '../models/data.model'
 import * as yup from 'yup'
+import { useNavigate } from 'react-router-dom'
 
 interface DataFormProps {
   onFormSubmit: () => void
@@ -32,6 +33,7 @@ export type FormData = {
 }
 
 const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
+  const navigate=useNavigate()
   const { user } = useContext(UserContext)
 
   const db = getFirestore(app)
@@ -143,6 +145,7 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
         formik.resetForm()
         onFormSubmit()
         setLoading(false)
+        navigate(`/Dashboard/${user?.userId}`)
       } catch (error) {
         console.log(error)
         setLoading(false)
@@ -217,7 +220,7 @@ const DataForm: React.FC<DataFormProps> = ({ onFormSubmit }) => {
               <Grid item xs={12}>
                 <TextField
                   variant="standard"
-                  label="Gass Usage"
+                  label="Gas Usage"
                   fullWidth
                   type="number"
                   value={formik.values.gasUsage}

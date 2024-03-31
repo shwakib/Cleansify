@@ -5,6 +5,8 @@ import { useFormik } from 'formik'
 import PersonalSignupForm from '../components/SignupForms/PersonalSignupForm'
 import OrganizationSignupForm from '../components/SignupForms/OrganizationSignupForm'
 import Dropdown from '../components/Dropdown'
+import BackButton from '../utils/BackButton'
+import { useNavigate } from 'react-router-dom'
 
 const Signup = () => {
   const formik = useFormik({
@@ -26,8 +28,15 @@ const Signup = () => {
     }
   }
 
+  const navigate=useNavigate();
+
+  const handleBackButton = () =>{
+    navigate('/')
+  }
+
   return (
     <Stack width={'100%'} gap={5}>
+      <BackButton onClick={handleBackButton}/>
       <form onSubmit={formik.handleSubmit}>
         <Grid container>
           <Grid item xs={12} md={6}>

@@ -15,6 +15,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import app from '../config/firebase.config'
 import { getAuth, signOut } from '@firebase/auth'
 import { useNavigate } from 'react-router'
+import BackButton from '../utils/BackButton'
 
 interface AppContainerProps {
   children: ReactNode
@@ -50,19 +51,30 @@ const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
     navigate('/')
   }
 
+  const handleSubmitButton = () =>{
+    navigate(`/Submit/${user?.userId}`)
+  }
+
+  const handleBackButton = () =>{
+    navigate(`/Dashboard/${user?.userId}`)
+  }
+
   return (
     <div style={{ background: theme.palette.background.default }}>
       {user && (
         <AppBar>
           <Toolbar>
+          <BackButton onClick={handleBackButton}/>
             <StyledAppbar maxWidth="lg">
-              <Stack>
-                <Typography>Signed in as: </Typography>{' '}
-                <Typography fontWeight={'bold'} ml={2}>
-                  {(user as PersonalUser)?.fullName ??
-                    (user as OrgUser)?.orgName}
-                </Typography>
+              <Stack alignItems="center">
+                <Typography marginLeft={80} marginTop={.6}>Signed in as: {(user as PersonalUser)?.fullName ??
+                    (user as OrgUser)?.orgName}</Typography>
               </Stack>
+              <Button onClick={handleSubmitButton}>
+                <Typography color={'white'} marginLeft={5}>
+                  Upload
+                </Typography>
+              </Button>
               <Button
                 variant="text"
                 color="error"

@@ -18,15 +18,35 @@ export const accountTypes: GenericItem[] = [
 
 export const StateNames: GenericItem[] = [
   {
-    name: 'City_A',
-    value: 'City_A'
+    name: 'Dhaka',
+    value: 'Dhaka'
   },
   {
-    name: 'City_B',
-    value: 'City_B'
+    name: 'Chittagong',
+    value: 'Chittagong'
   },
   {
-    name: 'City_C',
-    value: 'City_C'
+    name: 'Barishal',
+    value: 'Barishal'
+  },
+  {
+    name: 'Khulna',
+    value: 'Khulna'
+  },
+  {
+    name: 'Sylhet',
+    value: 'Sylhet'
+  },
+  {
+    name: 'Mymensingh',
+    value: 'Mymensingh'
+  },
+  {
+    name: 'Rangpur',
+    value: 'Rangpur'
+  },
+  {
+    name: 'Rajshahi',
+    value: 'Rajshahi'
   }
 ]

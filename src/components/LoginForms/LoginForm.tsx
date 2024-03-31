@@ -15,6 +15,7 @@ import { AccountTypes } from '../../constants/common'
 import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
 import { OrgUser, PersonalUser } from '../../models/user.model'
+import BackButton from '../../utils/BackButton'
 
 interface LoginFormProps {
   accountType: AccountTypes
@@ -27,6 +28,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ accountType }) => {
   const [error, setError] = useState<string>('')
 
   const navigate = useNavigate()
+
+  const handleBackButton = () =>{
+    navigate('/')
+  }
 
   const auth = getAuth(app)
   const db = getFirestore(app)
@@ -111,6 +116,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ accountType }) => {
 
   return (
     <>
+    <BackButton onClick={handleBackButton}/>
       {loading ? <Backdrop open={loading} /> : null}
       {error ? <Alert severity="error">{error}</Alert> : null}
       <form onSubmit={formik.handleSubmit}>
