@@ -11,7 +11,7 @@ import {
   Typography
 } from '@mui/material'
 import Dropdown from '../../components/Dropdown'
-import React, { Fragment, useState } from 'react'
+import React, { useState } from 'react'
 import {
   generateDaysInMonth,
   generateMonthsArray,
@@ -25,6 +25,7 @@ import app from '../../config/firebase.config'
 import { FamilyMembers, PersonalUser } from '../../models/user.model'
 import Backdrop from '../../components/Backdrop'
 import * as yup from 'yup'
+import { useNavigate } from 'react-router'
 
 interface FormValues extends Omit<PersonalUser, 'userId'> {
   password: string
@@ -35,6 +36,7 @@ const PersonalSignupForm = () => {
   const [showForm, setShowForm] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
+  const navigate = useNavigate()
 
   const auth = getAuth(app)
   const db = getFirestore(app)
@@ -118,6 +120,8 @@ const PersonalSignupForm = () => {
           }
           formik.resetForm()
           setFamilyMembers([])
+
+          navigate('/login')
         } catch (error) {
           setError((error as Error).message)
           await user.delete()
